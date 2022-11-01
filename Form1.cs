@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows.Forms;
 
 namespace DH
@@ -75,13 +76,18 @@ namespace DH
                              .Where(d => d.GetAttributeValue("class", "") == "kl-konu")
                              from div2 in div.Descendants("a")
                              select div2;
-                var b = baslik.First().InnerText.Trim();
-                var link = baslik.First().GetAttributeValue("href", "");
-                source.Add(new Link()
+                var firstHref = baslik.FirstOrDefault(b => b.InnerText.Trim() != "Bağlantılar");
+
+                if (firstHref != null)
                 {
-                    Name = b,
-                    Adres = link
-                });
+                    var baslikYazisi = HttpUtility.HtmlDecode(firstHref.InnerText.Trim());
+                    var link = firstHref.GetAttributeValue("href", "");
+                    source.Add(new Link()
+                    {
+                        Name = baslikYazisi,
+                        Adres = link
+                    });
+                }
             }
 
             lstResults.DataSource = source;
